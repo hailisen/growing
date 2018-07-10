@@ -1,0 +1,139 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.zcz.dao.EducationBackgroundMapper">
+  <resultMap id="BaseResultMap" type="com.zcz.bean.EducationBackground">
+    <id column="id" jdbcType="INTEGER" property="id" />
+    <result column="school" jdbcType="VARCHAR" property="school" />
+    <result column="major" jdbcType="VARCHAR" property="major" />
+    <result column="entry_date" jdbcType="DATE" property="entryDate" />
+    <result column="graduation_date" jdbcType="DATE" property="graduationDate" />
+    <result column="emp_id" jdbcType="INTEGER" property="empId" />
+    <result column="remark" jdbcType="VARCHAR" property="remark" />
+    <result column="order_num" jdbcType="INTEGER" property="orderNum" />
+    <result column="edu_level" jdbcType="VARCHAR" property="eduLevel" />
+  </resultMap>
+  <sql id="Base_Column_List">
+    id, school, major, entry_date, graduation_date, emp_id, remark, order_num,edu_level
+  </sql>
+  <select id="selectByPrimaryKey" parameterType="java.lang.Integer" resultMap="BaseResultMap">
+    select 
+    <include refid="Base_Column_List" />
+    from tb_education_background
+    where id = #{id,jdbcType=INTEGER}
+  </select>
+  <delete id="deleteByPrimaryKey" parameterType="java.lang.Integer">
+    delete from tb_education_background
+    where id = #{id,jdbcType=INTEGER}
+  </delete>
+  <insert id="insert" parameterType="com.zcz.bean.EducationBackground">
+    insert into tb_education_background (id, school, major, 
+      entry_date, graduation_date, emp_id, 
+      remark, order_num,edu_level)
+    values (#{id,jdbcType=INTEGER}, #{school,jdbcType=VARCHAR}, #{major,jdbcType=VARCHAR}, 
+      #{entryDate,jdbcType=DATE}, #{graduationDate,jdbcType=DATE}, #{empId,jdbcType=INTEGER}, 
+      #{remark,jdbcType=VARCHAR}, #{orderNum,jdbcType=INTEGER},#{eduLevel,jdbcType=VARCHAR})
+  </insert>
+  <insert id="insertSelective" parameterType="com.zcz.bean.EducationBackground" useGeneratedKeys="true" keyProperty="id">
+    insert into tb_education_background
+    <trim prefix="(" suffix=")" suffixOverrides=",">
+      <if test="id != null">
+        id,
+      </if>
+      <if test="school != null">
+        school,
+      </if>
+      <if test="major != null">
+        major,
+      </if>
+      <if test="entryDate != null">
+        entry_date,
+      </if>
+      <if test="graduationDate != null">
+        graduation_date,
+      </if>
+      <if test="empId != null">
+        emp_id,
+      </if>
+      <if test="remark != null">
+        remark,
+      </if>
+      <if test="orderNum != null">
+        order_num,
+      </if>
+      <if test="eduLevel != null">
+        edu_level,
+      </if>
+    </trim>
+    <trim prefix="values (" suffix=")" suffixOverrides=",">
+      <if test="id != null">
+        #{id,jdbcType=INTEGER},
+      </if>
+      <if test="school != null">
+        #{school,jdbcType=VARCHAR},
+      </if>
+      <if test="major != null">
+        #{major,jdbcType=VARCHAR},
+      </if>
+      <if test="entryDate != null">
+        #{entryDate,jdbcType=DATE},
+      </if>
+      <if test="graduationDate != null">
+        #{graduationDate,jdbcType=DATE},
+      </if>
+      <if test="empId != null">
+        #{empId,jdbcType=INTEGER},
+      </if>
+      <if test="remark != null">
+        #{remark,jdbcType=VARCHAR},
+      </if>
+      <if test="orderNum != null">
+        #{orderNum,jdbcType=INTEGER},
+      </if>
+      <if test="eduLevel != null">
+        #{eduLevel,jdbcType=VARCHAR},
+      </if>
+    </trim>
+  </insert>
+  <update id="updateByPrimaryKeySelective" parameterType="com.zcz.bean.EducationBackground">
+    update tb_education_background
+    <set>
+      <if test="school != null">
+        school = #{school,jdbcType=VARCHAR},
+      </if>
+      <if test="major != null">
+        major = #{major,jdbcType=VARCHAR},
+      </if>
+      <if test="entryDate != null">
+        entry_date = #{entryDate,jdbcType=DATE},
+      </if>
+      <if test="graduationDate != null">
+        graduation_date = #{graduationDate,jdbcType=DATE},
+      </if>
+      <if test="empId != null">
+        emp_id = #{empId,jdbcType=INTEGER},
+      </if>
+      <if test="remark != null">
+        remark = #{remark,jdbcType=VARCHAR},
+      </if>
+      <if test="orderNum != null">
+        order_num = #{orderNum,jdbcType=INTEGER},
+      </if>
+      <if test="eduLevel != null">
+        edu_level = #{eduLevel,jdbcType=VARCHAR},
+      </if>
+    </set>
+    where id = #{id,jdbcType=INTEGER}
+  </update>
+  <update id="updateByPrimaryKey" parameterType="com.zcz.bean.EducationBackground">
+    update tb_education_background
+    set school = #{school,jdbcType=VARCHAR},
+      major = #{major,jdbcType=VARCHAR},
+      entry_date = #{entryDate,jdbcType=DATE},
+      graduation_date = #{graduationDate,jdbcType=DATE},
+      emp_id = #{empId,jdbcType=INTEGER},
+      remark = #{remark,jdbcType=VARCHAR},
+      order_num = #{orderNum,jdbcType=INTEGER},
+      edu_level = #{eduLevel,jdbcType=VARCHAR}
+    where id = #{id,jdbcType=INTEGER}
+  </update>
+</mapper>

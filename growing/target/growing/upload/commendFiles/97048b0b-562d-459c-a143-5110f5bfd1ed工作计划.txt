@@ -1,0 +1,53 @@
+<div class='row-content am-cf'><div class='layui-upload-drag' id='test10'><i class='layui-icon'></i><p>点击上传，或将文件拖拽到此处</p></div></div>
+create or replace package body PK_Teacher_Growing is
+
+--根据条件获取教师列表
+TeacherCommunity  数据库用户
+
+
+  <!--查询未执行的变更信息-->
+  <select id="findAll" resultMap="BaseResultMap">
+    select <include refid="Base_Column_List"/> from tb_changed where method=0
+  </select>
+
+package com.zcz.dao;
+
+import com.zcz.bean.Changed;
+import org.springframework.stereotype.Component;
+
+import java.util.List;
+
+/**
+ * 员工变更表Dao层接口
+ */
+@Component
+public interface ChangedMapper {
+
+    /**
+     * 查询所有变更信息
+     * @return
+     */
+    List<Changed> findAll();
+
+    /**
+     * 新增员工变更
+     * @param record
+     * @return
+     */
+    int insertSelective(Changed record);
+
+    /**
+     * 删除员工变更信息
+     * @param id
+     * @return
+     */
+    int deleteByPrimaryKey(Integer id);
+
+    int insert(Changed record);
+
+    Changed selectByPrimaryKey(Integer id);
+
+    int updateByPrimaryKeySelective(Changed record);
+
+    int updateByPrimaryKey(Changed record);
+}

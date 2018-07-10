@@ -1,0 +1,97 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.zcz.dao.DbSaveMapper">
+  <resultMap id="BaseResultMap" type="com.zcz.bean.DbSave">
+    <id column="id" jdbcType="INTEGER" property="id" />
+    <result column="save_time" jdbcType="TIMESTAMP" property="saveTime" />
+    <result column="emp_name" jdbcType="VARCHAR" property="empName" />
+    <result column="filename" jdbcType="VARCHAR" property="filename" />
+    <result column="filepath" jdbcType="VARCHAR" property="filepath" />
+  </resultMap>
+  <sql id="Base_Column_List">
+    id, save_time, emp_name, filename, filepath
+  </sql>
+  <!-- 查询备份信息 -->
+  <select id="selectDbSaceList" resultMap="BaseResultMap">
+    select <include refid="Base_Column_List"/> from tb_db_save order by id desc
+  </select>
+  <select id="selectByPrimaryKey" parameterType="java.lang.Integer" resultMap="BaseResultMap">
+    select 
+    <include refid="Base_Column_List" />
+    from tb_db_save
+    where id = #{id,jdbcType=INTEGER}
+  </select>
+  <delete id="deleteByPrimaryKey" parameterType="java.lang.Integer">
+    delete from tb_db_save
+    where id = #{id,jdbcType=INTEGER}
+  </delete>
+  <insert id="insert" parameterType="com.zcz.bean.DbSave">
+    insert into tb_db_save (id, save_time, emp_name, 
+      filename, filepath)
+    values (#{id,jdbcType=INTEGER}, #{saveTime,jdbcType=TIMESTAMP}, #{empName,jdbcType=VARCHAR}, 
+      #{filename,jdbcType=VARCHAR}, #{filepath,jdbcType=VARCHAR})
+  </insert>
+  <insert id="insertSelective" parameterType="com.zcz.bean.DbSave">
+    insert into tb_db_save
+    <trim prefix="(" suffix=")" suffixOverrides=",">
+      <if test="id != null">
+        id,
+      </if>
+      <if test="saveTime != null">
+        save_time,
+      </if>
+      <if test="empName != null">
+        emp_name,
+      </if>
+      <if test="filename != null">
+        filename,
+      </if>
+      <if test="filepath != null">
+        filepath,
+      </if>
+    </trim>
+    <trim prefix="values (" suffix=")" suffixOverrides=",">
+      <if test="id != null">
+        #{id,jdbcType=INTEGER},
+      </if>
+      <if test="saveTime != null">
+        #{saveTime,jdbcType=TIMESTAMP},
+      </if>
+      <if test="empName != null">
+        #{empName,jdbcType=VARCHAR},
+      </if>
+      <if test="filename != null">
+        #{filename,jdbcType=VARCHAR},
+      </if>
+      <if test="filepath != null">
+        #{filepath,jdbcType=VARCHAR},
+      </if>
+    </trim>
+  </insert>
+  <update id="updateByPrimaryKeySelective" parameterType="com.zcz.bean.DbSave">
+    update tb_db_save
+    <set>
+      <if test="saveTime != null">
+        save_time = #{saveTime,jdbcType=TIMESTAMP},
+      </if>
+      <if test="empName != null">
+        emp_name = #{empName,jdbcType=VARCHAR},
+      </if>
+      <if test="filename != null">
+        filename = #{filename,jdbcType=VARCHAR},
+      </if>
+      <if test="filepath != null">
+        filepath = #{filepath,jdbcType=VARCHAR},
+      </if>
+    </set>
+    where id = #{id,jdbcType=INTEGER}
+  </update>
+  <update id="updateByPrimaryKey" parameterType="com.zcz.bean.DbSave">
+    update tb_db_save
+    set save_time = #{saveTime,jdbcType=TIMESTAMP},
+      emp_name = #{empName,jdbcType=VARCHAR},
+      filename = #{filename,jdbcType=VARCHAR},
+      filepath = #{filepath,jdbcType=VARCHAR}
+    where id = #{id,jdbcType=INTEGER}
+  </update>
+</mapper>

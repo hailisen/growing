@@ -1,0 +1,171 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.zcz.dao.CommendMapper">
+  <resultMap id="BaseResultMap" type="com.zcz.bean.Commend">
+    <id column="id" jdbcType="INTEGER" property="id" />
+    <result column="level" jdbcType="VARCHAR" property="level" />
+    <result column="commend_name" jdbcType="VARCHAR" property="commendName" />
+    <result column="emp_id" jdbcType="INTEGER" property="empId" />
+    <result column="note" jdbcType="VARCHAR" property="note" />
+    <result column="get_time" jdbcType="DATE" property="getTime" />
+    <result column="url" jdbcType="VARCHAR" property="url" />
+    <result column="file_name" jdbcType="VARCHAR" property="fileName" />
+  </resultMap>
+  <sql id="Base_Column_List">
+    id, level, commend_name, emp_id, note, get_time, url, file_name
+  </sql>
+  <!--查询表彰表里的年份，用于条件查询-->
+  <select id="findCommendYear" resultType="java.lang.Integer">
+      select distinct year(get_time) from tb_commend order by get_time desc
+  </select>
+  <!--删除表彰-->
+  <delete id="deleteById">
+    delete from tb_commend where id = #{id}
+  </delete>
+  <!--分页查询表彰统计列表-->
+  <select id="findCommendList" resultType="com.zcz.bean.vo.CommendList">
+    select tc.id,te.name,te.phone,tb.dept_name as deptName,tp.post_name as postName,tc.commend_name as commendName,
+    tc.note,tc.`level`,tc.get_time as getTime,tc.file_name as fileName,tc.url
+    from tb_employee te
+    inner join tb_post tp on tp.id=te.post_id
+    inner join tb_dept tb on tb.id=te.dept_id
+    inner join tb_commend tc on te.id=tc.emp_id
+    <where>
+      <if test="getYear!=null and getYear!=''.toString()">
+        YEAR(get_time)=#{getYear,jdbcType=INTEGER}
+      </if>
+      <if test="level!=null and level!=''.toString()">
+        and level=#{level}
+      </if>
+    </where>
+    limit #{start},#{pageSize}
+  </select>
+  <!--查询总条数-->
+  <select id="findCommendCount" resultType="java.lang.Integer">
+    select count(*)
+    from tb_employee te
+    inner join tb_post tp on tp.id=te.post_id
+    inner join tb_dept tb on tb.id=te.dept_id
+    inner join tb_commend tc on te.id=tc.emp_id
+    <where>
+      <if test="getYear!=null and getYear!=''.toString()">
+        YEAR(get_time)=#{getYear,jdbcType=INTEGER}
+      </if>
+      <if test="level!=null and level!=''.toString()">
+        and level=#{level}
+      </if>
+    </where>
+  </select>
+  <!--查询一条数据-->
+  <select id="selectByPrimaryKey" parameterType="java.lang.Integer" resultMap="BaseResultMap">
+    select 
+    <include refid="Base_Column_List" />
+    from tb_commend
+    where id = #{id,jdbcType=INTEGER}
+  </select>
+  <delete id="deleteByPrimaryKey" parameterType="java.lang.Integer">
+    delete from tb_commend
+    where id = #{id,jdbcType=INTEGER}
+  </delete>
+  <insert id="insert" parameterType="com.zcz.bean.Commend">
+    insert into tb_commend (id, level, commend_name, 
+      emp_id, note, get_time, 
+      url, file_name)
+    values (#{id,jdbcType=INTEGER}, #{level,jdbcType=VARCHAR}, #{commendName,jdbcType=VARCHAR}, 
+      #{empId,jdbcType=INTEGER}, #{note,jdbcType=VARCHAR}, #{getTime,jdbcType=DATE}, 
+      #{url,jdbcType=VARCHAR}, #{fileName,jdbcType=VARCHAR})
+  </insert>
+  <insert id="insertSelective" parameterType="com.zcz.bean.Commend" useGeneratedKeys="true" keyProperty="id">
+    insert into tb_commend
+    <trim prefix="(" suffix=")" suffixOverrides=",">
+      <if test="id != null">
+        id,
+      </if>
+      <if test="level != null">
+        level,
+      </if>
+      <if test="commendName != null">
+        commend_name,
+      </if>
+      <if test="empId != null">
+        emp_id,
+      </if>
+      <if test="note != null">
+        note,
+      </if>
+      <if test="getTime != null">
+        get_time,
+      </if>
+      <if test="url != null">
+        url,
+      </if>
+      <if test="fileName != null">
+        file_name,
+      </if>
+    </trim>
+    <trim prefix="values (" suffix=")" suffixOverrides=",">
+      <if test="id != null">
+        #{id,jdbcType=INTEGER},
+      </if>
+      <if test="level != null">
+        #{level,jdbcType=VARCHAR},
+      </if>
+      <if test="commendName != null">
+        #{commendName,jdbcType=VARCHAR},
+      </if>
+      <if test="empId != null">
+        #{empId,jdbcType=INTEGER},
+      </if>
+      <if test="note != null">
+        #{note,jdbcType=VARCHAR},
+      </if>
+      <if test="getTime != null">
+        #{getTime,jdbcType=DATE},
+      </if>
+      <if test="url != null">
+        #{url,jdbcType=VARCHAR},
+      </if>
+      <if test="fileName != null">
+        #{fileName,jdbcType=VARCHAR},
+      </if>
+    </trim>
+  </insert>
+  <update id="updateByPrimaryKeySelective" parameterType="com.zcz.bean.Commend">
+    update tb_commend
+    <set>
+      <if test="level != null">
+        level = #{level,jdbcType=VARCHAR},
+      </if>
+      <if test="commendName != null">
+        commend_name = #{commendName,jdbcType=VARCHAR},
+      </if>
+      <if test="empId != null">
+        emp_id = #{empId,jdbcType=INTEGER},
+      </if>
+      <if test="note != null">
+        note = #{note,jdbcType=VARCHAR},
+      </if>
+      <if test="getTime != null">
+        get_time = #{getTime,jdbcType=DATE},
+      </if>
+      <if test="url != null">
+        url = #{url,jdbcType=VARCHAR},
+      </if>
+      <if test="fileName != null">
+        file_name = #{fileName,jdbcType=VARCHAR},
+      </if>
+    </set>
+    where id = #{id,jdbcType=INTEGER}
+  </update>
+  <update id="updateByPrimaryKey" parameterType="com.zcz.bean.Commend">
+    update tb_commend
+    set level = #{level,jdbcType=VARCHAR},
+      commend_name = #{commendName,jdbcType=VARCHAR},
+      emp_id = #{empId,jdbcType=INTEGER},
+      note = #{note,jdbcType=VARCHAR},
+      get_time = #{getTime,jdbcType=DATE},
+      url = #{url,jdbcType=VARCHAR},
+      file_name = #{fileName,jdbcType=VARCHAR}
+    where id = #{id,jdbcType=INTEGER}
+  </update>
+</mapper>

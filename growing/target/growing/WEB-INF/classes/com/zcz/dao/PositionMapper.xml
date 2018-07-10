@@ -1,0 +1,162 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.zcz.dao.PositionMapper">
+  <resultMap id="BaseResultMap" type="com.zcz.bean.Position">
+    <id column="id" jdbcType="INTEGER" property="id" />
+    <result column="position_name" jdbcType="VARCHAR" property="positionName" />
+    <result column="category_id" jdbcType="INTEGER" property="categoryId" />
+  </resultMap>
+  <sql id="Base_Column_List">
+    id, position_name, category_id
+  </sql>
+
+  <!--查询职称类别列表-->
+  <select id="categoryList" resultType="java.util.Map">
+    select tc.id,tc.cate_name as cateName,tc.note,count(tp.id) as empNum
+    from tb_position tp
+    inner join tb_cate_level cle on cle.id=tp.category_id
+    right join tb_category tc on tc.id=cle.category_id
+    group by tc.id
+  </select>
+  <!--根据职称类别ID获取职称级别列表-->
+  <select id="findCateLevleByCateId" resultType="java.util.Map">
+    select cl.id,cl.level_name as level,cl.time_limit as timeLimit from tb_cate_level cl
+    inner join tb_category tc on cl.category_id=tc.id
+    where tc.id=#{cateId}
+  </select>
+  <!--查询职称列表-->
+  <select id="getPositionList" resultType="java.util.Map">
+    select tp.id,tp.position_name as positionName,cate.cate_name as cateName,
+    cateLevel.time_limit as timeLimit ,count(te.id) as empNum
+    from tb_employee te
+    right join tb_position_emp tpe on tpe.emp_id=te.id
+    right join tb_position tp on tp.id=tpe.position_id
+    inner join tb_cate_level cateLevel on cateLevel.id=tp.category_id
+    inner join tb_category cate on cate.id=cateLevel.category_id
+    group by tp.id
+  </select>
+  <!--查询职称类别-->
+  <select id="findCategory" resultType="java.util.Map">
+    select id,tc.cate_name as cateName from tb_category tc
+  </select>
+  <!--根据职称类别获取职称下拉框-->
+  <select id="findPositionByCate" resultType="java.util.Map">
+    select tp.id,position_name as positionName
+    from tb_position tp
+    inner JOIN tb_cate_level cateLevel on cateLevel.id = tp.category_id
+    inner join tb_category tc on tc.id=cateLevel.category_id
+    where tc.id=#{categoryId}
+  </select>
+  <!--根据职称名称查询职称ID-->
+  <select id="findIdByName" resultType="java.lang.Integer">
+    select tp.id from tb_position tp where tp.position_name=#{positionName}
+  </select>
+  <!--查询职称下拉框列表-->
+  <select id="findPosition" resultType="java.util.Map">
+    select id,position_name as positionName from tb_position
+  </select>
+  <!--给员工添加职称-->
+  <insert id="addPositionFroEmp" parameterType="java.util.Map" useGeneratedKeys="true" keyProperty="id">
+    insert into tb_position_emp (position_id,emp_id,get_time,url,file_name) values(#{positionId},#{empId},#{getTime},#{url},#{fileName})
+  </insert>
+  <!--修改员工职称-->
+  <update id="updatePositionForEmp">
+    update tb_position_emp
+    <set>
+      <if test="positionId != null">
+        position_id = #{positionId,jdbcType=INTEGER},
+      </if>
+      <if test="empId != null">
+        emp_id = #{empId,jdbcType=INTEGER},
+      </if>
+      <if test="getTime != null">
+        get_time = #{getTime},
+      </if>
+      <if test="url != null">
+        url = #{url,jdbcType=VARCHAR},
+      </if>
+      <if test="fileName != null">
+        file_name = #{fileName,jdbcType=VARCHAR},
+      </if>
+    </set>
+    where id = #{id,jdbcType=INTEGER}
+  </update>
+  <!--删除员工职称-->
+  <delete id="deletePositionEmp">
+      delete from tb_position_emp where id=#{peId}
+  </delete>
+  <select id="selectByPrimaryKey" parameterType="java.lang.Integer" resultMap="BaseResultMap">
+    select 
+    <include refid="Base_Column_List" />
+    from tb_position
+    where id = #{id,jdbcType=INTEGER}
+  </select>
+  <delete id="deleteByPrimaryKey" parameterType="java.lang.Integer">
+    delete from tb_position
+    where id = #{id,jdbcType=INTEGER}
+  </delete>
+  <insert id="insert" parameterType="com.zcz.bean.Position">
+    insert into tb_position (id, position_name, category_id
+      )
+    values (#{id,jdbcType=INTEGER}, #{positionName,jdbcType=VARCHAR}, #{categoryId,jdbcType=INTEGER}
+      )
+  </insert>
+  <insert id="insertSelective" parameterType="com.zcz.bean.Position">
+    insert into tb_position
+    <trim prefix="(" suffix=")" suffixOverrides=",">
+      <if test="id != null">
+        id,
+      </if>
+      <if test="positionName != null">
+        position_name,
+      </if>
+      <if test="categoryId != null">
+        category_id,
+      </if>
+    </trim>
+    <trim prefix="values (" suffix=")" suffixOverrides=",">
+      <if test="id != null">
+        #{id,jdbcType=INTEGER},
+      </if>
+      <if test="positionName != null">
+        #{positionName,jdbcType=VARCHAR},
+      </if>
+      <if test="categoryId != null">
+        #{categoryId,jdbcType=INTEGER},
+      </if>
+    </trim>
+  </insert>
+  <update id="updateByPrimaryKeySelective" parameterType="com.zcz.bean.Position">
+    update tb_position
+    <set>
+      <if test="positionName != null">
+        position_name = #{positionName,jdbcType=VARCHAR},
+      </if>
+      <if test="categoryId != null">
+        category_id = #{categoryId,jdbcType=INTEGER},
+      </if>
+    </set>
+    where id = #{id,jdbcType=INTEGER}
+  </update>
+  <update id="updateByPrimaryKey" parameterType="com.zcz.bean.Position">
+    update tb_position
+    set position_name = #{positionName,jdbcType=VARCHAR},
+      category_id = #{categoryId,jdbcType=INTEGER}
+    where id = #{id,jdbcType=INTEGER}
+  </update>
+  <update id="updateCategory">
+    update tb_category
+    <set>
+      <if test="cateName != null and cateName != ''.toString()">
+        cate_name = #{cateName,jdbcType=VARCHAR},
+      </if>
+      <if test="levelNum != null and levelNum != ''.toString()">
+        level_num = #{levelNum,jdbcType=INTEGER},
+      </if>
+      <if test="note != null and note != ''.toString()">
+        note = #{note,jdbcType=VARCHAR},
+      </if>
+    </set>
+    where id = #{id,jdbcType=INTEGER}
+  </update>
+</mapper>

@@ -1,0 +1,109 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.zcz.dao.DeptMapper">
+  <resultMap id="BaseResultMap" type="com.zcz.bean.Dept">
+    <id column="id" jdbcType="INTEGER" property="id" />
+    <result column="dept_name" jdbcType="VARCHAR" property="deptName" />
+    <result column="note" jdbcType="VARCHAR" property="note" />
+    <result column="order_num" jdbcType="INTEGER" property="orderNum" />
+  </resultMap>
+  <sql id="Base_Column_List">
+    id, dept_name, note, order_num
+  </sql>
+  <!--根据查询排序号查询部门-->
+  <select id="findDeptByOrder" resultMap="BaseResultMap">
+    select <include refid="Base_Column_List"/> from tb_dept where order_num &gt; #{orderNum}
+  </select>
+  <!--查询当前orderNum最大的数-->
+  <select id="findOrderNum" resultType="java.lang.Integer">
+    select max(order_num) from tb_dept
+  </select>
+  <update id="updateOrderByOrder">
+    update tb_dept set order_num=#{newOrder} where order_num=#{oldOrder}
+  </update>
+  <update id="updateOrderById">
+    update tb_dept set order_num=#{newOrder} where id=#{deptId}
+  </update>
+  <!--查询所有部门的信息-->
+  <select id="findDeptList" resultType="java.util.Map">
+    select td.id,td.dept_name as deptName,count(te.id) as empNum,td.note,td.order_num as orderNum
+    from tb_employee te
+    inner join tb_post tp on tp.id=te.post_id
+    right join tb_dept td on td.id=te.dept_id
+    group by td.id
+    order by td.order_num
+  </select>
+  <!--查询部门下拉框列表-->
+  <select id="findDept" resultType="java.util.Map">
+    select id,dept_name as deptName from tb_dept
+  </select>
+  <select id="selectByPrimaryKey" parameterType="java.lang.Integer" resultMap="BaseResultMap">
+    select 
+    <include refid="Base_Column_List" />
+    from tb_dept
+    where id = #{id,jdbcType=INTEGER}
+  </select>
+  <delete id="deleteByPrimaryKey" parameterType="java.lang.Integer">
+    delete from tb_dept
+    where id = #{id,jdbcType=INTEGER}
+  </delete>
+  <insert id="insert" parameterType="com.zcz.bean.Dept">
+    insert into tb_dept (id, dept_name, note, 
+      order_num)
+    values (#{id,jdbcType=INTEGER}, #{deptName,jdbcType=VARCHAR}, #{note,jdbcType=VARCHAR}, 
+      #{orderNum,jdbcType=INTEGER})
+  </insert>
+  <insert id="insertSelective" parameterType="com.zcz.bean.Dept">
+    insert into tb_dept
+    <trim prefix="(" suffix=")" suffixOverrides=",">
+      <if test="id != null">
+        id,
+      </if>
+      <if test="deptName != null">
+        dept_name,
+      </if>
+      <if test="note != null">
+        note,
+      </if>
+      <if test="orderNum != null">
+        order_num,
+      </if>
+    </trim>
+    <trim prefix="values (" suffix=")" suffixOverrides=",">
+      <if test="id != null">
+        #{id,jdbcType=INTEGER},
+      </if>
+      <if test="deptName != null">
+        #{deptName,jdbcType=VARCHAR},
+      </if>
+      <if test="note != null">
+        #{note,jdbcType=VARCHAR},
+      </if>
+      <if test="orderNum != null">
+        #{orderNum,jdbcType=INTEGER},
+      </if>
+    </trim>
+  </insert>
+  <update id="updateByPrimaryKeySelective" parameterType="com.zcz.bean.Dept">
+    update tb_dept
+    <set>
+      <if test="deptName != null">
+        dept_name = #{deptName,jdbcType=VARCHAR},
+      </if>
+      <if test="note != null">
+        note = #{note,jdbcType=VARCHAR},
+      </if>
+      <if test="orderNum != null">
+        order_num = #{orderNum,jdbcType=INTEGER},
+      </if>
+    </set>
+    where id = #{id,jdbcType=INTEGER}
+  </update>
+  <update id="updateByPrimaryKey" parameterType="com.zcz.bean.Dept">
+    update tb_dept
+    set dept_name = #{deptName,jdbcType=VARCHAR},
+      note = #{note,jdbcType=VARCHAR},
+      order_num = #{orderNum,jdbcType=INTEGER}
+    where id = #{id,jdbcType=INTEGER}
+  </update>
+</mapper>

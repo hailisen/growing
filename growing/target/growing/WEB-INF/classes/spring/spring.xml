@@ -1,0 +1,123 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+       xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:context="http://www.springframework.org/schema/context"
+       xmlns:aop="http://www.springframework.org/schema/aop" xmlns:tx="http://www.springframework.org/schema/tx"
+       xmlns:task="http://www.springframework.org/schema/task"
+       xsi:schemaLocation="http://www.springframework.org/schema/beans
+				         http://www.springframework.org/schema/beans/spring-beans-4.0.xsd
+				         http://www.springframework.org/schema/context
+				         http://www.springframework.org/schema/context/spring-context-4.0.xsd
+				         http://www.springframework.org/schema/tx
+				         http://www.springframework.org/schema/tx/spring-tx-4.0.xsd
+				         http://www.springframework.org/schema/task
+				         http://www.springframework.org/schema/task/spring-task-3.0.xsd
+				         http://www.springframework.org/schema/aop
+				         http://www.springframework.org/schema/aop/spring-aop-4.0.xsd">
+
+    <!--开启自动扫描-->
+   <!-- <context:component-scan base-package="com.zhsw"/>-->
+    <context:component-scan base-package="com.zcz" />
+    <context:component-scan base-package="com.zcz.service.impl" />
+    <!--引入配置属性文件 -->
+    <context:property-placeholder location="classpath:jdbc.properties" />
+    <!--引入spirng-mybatis配置-->
+    <!--<import resource="classpath:spring/spring-mybatis.xml"/>-->
+    <!-- c3p0数据源 -->
+    <bean id="dataSource" class="com.mchange.v2.c3p0.ComboPooledDataSource">
+        <property name="driverClass" value="com.mysql.jdbc.Driver"/>
+        <property name="jdbcUrl" value="jdbc:mysql://localhost:3306/kinder_crm?characterEncoding=UTF-8"/>
+        <property name="user" value="root"/>
+        <property name="password" value="root"/>
+        <!-- 数据源个性化配置，根据实际项目需求进行： -->
+        <property name="testConnectionOnCheckout" value="false"/>
+        <property name="testConnectionOnCheckin" value="true"/>
+        <property name="idleConnectionTestPeriod" value="3600"/>
+        <property name="initialPoolSize" value="3"/>
+        <property name="minPoolSize" value="5"/>
+        <property name="maxPoolSize" value="20"/>
+        <property name="maxConnectionAge" value="28800"/>
+        <property name="maxIdleTime" value="21600"/>
+    </bean>
+    <!--配置SqlSessionFactory-->
+    <bean id="sqlSessionFactory" class="org.mybatis.spring.SqlSessionFactoryBean">
+        <!-- 引入数据源 -->
+        <property name="dataSource" ref="dataSource" />
+        <!--引入myBatis的核心配置文件-->
+        <property name="configLocation" value="classpath:mybatis/mybatis.xml" />
+        <!-- 自动扫描entity目录, 省掉Configuration.xml里的手工配置 -->
+        <property name="mapperLocations" value="classpath:com/zcz/dao/*.xml"></property>
+    </bean>
+
+    <!-- 对所有的dao进行统一注入 -->
+    <bean class="org.mybatis.spring.mapper.MapperScannerConfigurer">
+        <property name="basePackage" value="com.zcz.dao" />
+        <property name="sqlSessionFactoryBeanName" value="sqlSessionFactory" />
+    </bean>
+
+    <!-- 配置事务 -->
+    <bean id="transactionManager"
+          class="org.springframework.jdbc.datasource.DataSourceTransactionManager">
+        <property name="dataSource" ref="dataSource"></property>
+    </bean>
+    <!-- 事务管理策略 -->
+    <tx:advice id="tx" transaction-manager="transactionManager">
+        <tx:attributes>
+            <tx:method name="*" />
+        </tx:attributes>
+    </tx:advice>
+    <!-- 配置事务传播特性 -->
+    <tx:advice id="txAdvice" transaction-manager="transactionManager">
+        <tx:attributes>
+            <!-- 传播行为 -->
+            <!-- 我们可以设置isolation下面这些枚举值：
+             DEFAULT：采用数据库默认隔离级别
+             SERIALIZABLE：最严格的级别，事务串行执行，资源消耗最大；
+             REPEATABLE_READ：保证了一个事务不会修改已经由另一个事务读取但未提交（回滚）的数据。避免了“脏读取”和“不可重复读取”的情况，但是带来了更多的性能损失。
+             READ_COMMITTED:大多数主流数据库的默认事务等级，保证了一个事务不会读到另一个并行事务已修改但未提交的数据，避免了“脏读取”。该级别适用于大多数系统。
+             READ_UNCOMMITTED：保证了读取过程中不会读取到非法数据。隔离级别在于处理多事务的并发问题。-->
+            <!--
+                事务的传播特性
+                关于propagation属性的7个传播行为
+                REQUIRED：指定当前方法必需在事务环境中运行，如果当前有事务环境就加入当前正在执行的事务环境，如果当前没有事务，就新建一个事务。这是默认值。
+                SUPPORTS：指定当前方法加入当前事务环境，如果当前没有事务，就以非事务方式执行。
+                MANDATORY：指定当前方法必须加入当前事务环境，如果当前没有事务，就抛出异常。
+                REQUIRES_NEW：指定当前方法总是会为自己发起一个新的事务，如果发现当前方法已运行在一个事务中,则原有事务被挂起,我自己创建一个属于自己的事务,
+                              直我自己这个方法commit结束,原先的事务才会恢复执行。
+                NOT_SUPPORTED：指定当前方法以非事务方式执行操作，如果当前存在事务，就把当前事务挂起，等我以非事务的状态运行完，再继续原来的事务。
+                NEVER：指定当前方法绝对不能在事务范围内执行，如果方法在某个事务范围内执行，容器就抛异常，只有没关联到事务，才正常执行。
+                NESTED：指定当前方法执行时，如果已经有一个事务存在,则运行在这个嵌套的事务中.如果当前环境没有运行的事务，就新建一个事务，并与父事务相互独立，
+                        这个事务拥有多个可以回滚的保证点。就是指我自己内部事务回滚不会对外部事务造成影响，只对DataSourceTransactionManager事务管理器起效。
+                            -->
+            <tx:method name="save*" />
+            <tx:method name="insert*" />
+            <tx:method name="add*" />
+            <tx:method name="create*" />
+            <tx:method name="delete*" />
+            <tx:method name="update*" isolation="REPEATABLE_READ"/>
+            <tx:method name="find*" propagation="SUPPORTS" read-only="true" />
+            <tx:method name="select*" propagation="SUPPORTS" read-only="true" />
+            <tx:method name="get*" propagation="SUPPORTS" read-only="true" />
+        </tx:attributes>
+    </tx:advice>
+    <!--
+     切入点表达式
+        第一个* 方法的访问权限 可以忽略
+        第二个* 代表方法的返回值
+        .. 在路径中代表任意包(包括子包)
+        *在路径中代表任意子包 仅限一层
+        第三个* 代表类名
+        第四个* 代表方法名
+        括号中的.. 代表参数类型个数任意-->
+    <aop:config>
+        <aop:pointcut expression="bean(*Service)" id="p" />
+        <aop:advisor advice-ref="tx" pointcut-ref="p" />
+    </aop:config>
+
+    <!--允许注解式事务配置-->
+    <!-- 声明使用注解式事务 -->
+    <tx:annotation-driven transaction-manager="transactionManager" />
+    <!-- 扫描dao所在的包 -->
+    <context:component-scan base-package="com.zcz.dao" />
+    <!-- 包含shiro的配置文件 -->
+    <import resource="classpath:spring/applicationContext-shiro.xml"/>
+</beans>

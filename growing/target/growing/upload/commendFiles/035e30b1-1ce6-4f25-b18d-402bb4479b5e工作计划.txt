@@ -1,0 +1,15 @@
+添加学历时，学历等级为0123456 分别对应初中本科博士等
+添加学历时，判断学历等级是否有已有的学历数大如果有，把对应员工的学历改为对应的学历等级
+
+
+
+
+
+id="xinxi-name"
+id="xinxi-sex"
+id="xinxi-empNo"
+id="xinxi-persionId"
+id="xinxi-entryDay"
+id="xinxi-brithday"
+id="xinxi-navitePlace"
+id="xinxi-phone"
